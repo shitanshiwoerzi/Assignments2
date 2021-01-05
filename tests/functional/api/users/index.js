@@ -86,31 +86,4 @@ describe("Users endpoint", () => {
         });
     });
   });
-
-  describe("POST / Movie favourites ", function() {
-    this.timeout(5000);
-    it("should return a 201 status and user message", (done) =>{
-        request(api)
-        .post("/api/users/user1/favourites")
-        .send({
-          id: 671583
-        })
-        .expect(201)
-        .end((err,res)=> {
-          expect(res.body).to.be.a("Object");
-          done();
-        })
-          request(api)
-          .get("api/users/user1/favourites")
-          .set("Accept", "application/json")
-          .expect("Content-Type", /json/)
-          .expect(200)
-          .end((err,res)=> {
-            expect(res.body).to.be.a("array");
-            let result = res.body.map((favourite) => favourite.id);
-            expect(result).to.have.members([671583]);
-            done();
-          });
-    });
-  });
 });
