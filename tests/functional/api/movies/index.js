@@ -28,17 +28,31 @@ describe('Movies endpoint',  function (){
       });
     });
     describe("GET /movies ", () => {
-        it("should check token and return the 20 movies", (done) => {
-          request(api)
-          .get("/api/movies")
-          .set("Accept", "application/json")
-          .set("Authorization", token)
-          .expect("Content-Type", /json/)
-          .expect(200)
-          .end((err, res) => {
-              expect(res.body).to.be.a("array");
-              expect(res.body.length).to.equal(20);
-            done();
+      describe("when the token is valid", () => {
+          it("should check token and return the 20 movies", (done) => {
+            request(api)
+            .get("/api/movies")
+            .set("Accept", "application/json")
+            .set("Authorization", token)
+            .expect("Content-Type", /json/)
+            .expect(200)
+            .end((err, res) => {
+                expect(res.body).to.be.a("array");
+                expect(res.body.length).to.equal(20);
+              done();
+            });
+          });
+        });
+        describe("when the token is invalid", () => {
+          it("should return 401 and Unauthorized", (done) => {
+             request(api)
+            .get("/api/movies")
+            .set("Accept", "application/json")
+            .expect("Content-Type", /json/)
+            .end((err, res)=>{
+              expect(res.status).to.equal(401);
+              done();
+            });
           });
         });
       });
