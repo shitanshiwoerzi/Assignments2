@@ -3,8 +3,12 @@ import express from 'express';
 import moviesRouter from './api/movies';
 import bodyParser from 'body-parser';
 import './db';
-import {loadUsers, loadMovies} from './seedData';
+import {loadUsers, loadMovies, loadActors, loadNowplaying, loadUpcoming, loadToprated} from './seedData';
 import usersRouter from './api/users';
+import actorsRouter from './api/actors';
+import upcomingRouter from './api/upcoming';
+import nowplayingRouter from './api/nowplaying';
+import topratedRouter from './api/toprated';
 import passport from './authenticate';
 import session from 'express-session';
 
@@ -22,6 +26,10 @@ const errHandler = (err, req, res, next) => {
 if (process.env.SEED_DB) {
   loadUsers();
   loadMovies();
+  loadActors();
+  loadNowplaying();
+  loadUpcoming();
+  loadToprated();
 }
 const app = express();
 
@@ -38,7 +46,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.static('public'));
 app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
+app.use('/api/upcoming', upcomingRouter);
+app.use('/api/nowplaying', nowplayingRouter);
+app.use('/api/toprated', topratedRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/actor', actorsRouter);
 app.use(errHandler);
 
 
