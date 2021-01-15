@@ -1,6 +1,7 @@
 import dotenv, { load } from 'dotenv';
 import express from 'express';
 import moviesRouter from './api/movies';
+import movieModel from './api/movies/movieModel'
 import bodyParser from 'body-parser';
 import './db';
 import {loadUsers, loadMovies, loadActors, loadNowplaying, loadUpcoming, loadToprated} from './seedData';
@@ -32,8 +33,26 @@ if (process.env.SEED_DB) {
   loadToprated();
 }
 const app = express();
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const port = process.env.PORT;
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: 'Movie Api',
+      description: 'Movie API Information',
+      contact: {
+        name: 'Amazing Developer'
+      },
+      servers: ['http://localhost:8080']
+    }
+  },
+  apis:['index.js']
+};
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
 
 app.use(passport.initialize());
 
@@ -51,7 +70,56 @@ app.use('/api/nowplaying', nowplayingRouter);
 app.use('/api/toprated', topratedRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/actor', actorsRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use(errHandler);
+
+/**
+ * @swagger
+ * /movies:
+ *  get:
+ *      description: Use to request all movies
+ *      responses:
+ *          '200':
+ *            description: A successful request
+ */
+
+ app.get('/movies',(req,res)=> {
+   movieModel.find().then(movies => res.status(200).send(movies))
+ });
+
+ /**
+  * @swagger
+  * /movies/{Id}:
+  * get:
+  *     descripition: Use to request a movie
+  *     parameters:
+  *     - name: "Id"
+  *       in: 'path'
+  *       descripition: 'ID of movie of return'
+  *       required: true
+  *       type: 'integer'
+  *     responses:
+  *         '200':
+  *           description: A successful request
+  */
+app.get('/movies/{Id}', (req,res)=>{
+  movieModel.findByMovieDBId(id).then(movie =>res.status(200).send(movie));
+});
+
+ /**
+ * @swagger
+ * /movie:
+ *  put:
+ *      description: Use to update a movie
+ *      responses:
+ *          '201':
+ *            description: A successful response
+ */
+
+app.put('/movie',(req,res)=> {
+  res.status(200).send('Successfully updated movie');
+});
+
 
 
 const server = app.listen(port, () => {
