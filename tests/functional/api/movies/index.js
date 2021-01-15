@@ -3,8 +3,8 @@ import request from "supertest";
 import api from "../../../../index";  // Express API application 
 
 const expect = chai.expect;
-const currentMovieId = 671583;
-const currentMovieTitle = "Upside-Down Magic";
+const currentMovieId = 590706 ;
+const currentMovieTitle = "Jiu Jitsu";
 let token;
 
 describe('Movies endpoint',  function (){
@@ -84,4 +84,27 @@ describe('Movies endpoint',  function (){
           });
         });
       });
+
+    describe("Delete /movies/:id",()=>{
+      describe("when the movie exists",()=>{
+        it("should return 200 and delete successfully",()=>{
+            return request(api)
+              .delete(`/api/movies/${currentMovieId}`)
+              .set("Accept", "application/json")
+              .set("Authorization", token)
+              .expect(200)
+              .expect('delete successfully');
+          });
+          after(() => {
+            return request(api)
+              .get(`/api/movies/${currentMovieId}`)
+              .set("Authorization", token)
+              .expect(404)
+              .expect({
+                message: `Unable to find movie with id: ${currentMovieId}.`,
+                status: 404,
+          });
+        });
+      })
+    });
 });

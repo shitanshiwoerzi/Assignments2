@@ -5,7 +5,7 @@ Name: Ziqi Zhou
 ## Features.
 
 ...... A bullet-point list of the ADDITIONAL features you have implemented in the API **THAT WERE NOT IN THE LABS** ......,
- 
+
  + Feature 1 - .... a statement of its purpose/objective ..... 
  + Feature 2 - .......
  + Feature 3 = ......
@@ -98,21 +98,36 @@ Name: Ziqi Zhou
 + Get /api/movies/:id - returns detailed information on a specific movie.
 + Put /api/movies/:id - update a specific movie. The request payload includes the some/all of the following movie properties to be updated: title, genre list, release date.
 + Post /api/movies - add a new movie to the database.
-+ etc.
-+ etc.  
++ Get /api/movies/:id/reviews - returns a review of a specific movie.
++ Post /api/movies/:id/reviews - add a new review to the specific movie.
++ Delete /api/movies/:id - delete a specific movie.
++ Get /api/actors - returns an array of actor objects.
++ Get /api/upcoming - returns an array of upcoming movie objects.
++ Get /api/nowplaying - returns an array of now-playing movie objects.
++ Get /api/toprated - returns an array of top-rated objects.
++ Get /api/users - returns an array of user objects.
++ Post /api/users - add a new user to the database.
++ Put /api/users/:id - update a specific user.
++ Get /api/:userName/favourites - returns detailed information of favourite movies.
++ Post /api/users/:userName/favourites - add a specific movie to favourite.
 
 ## Error/Exception Testing.
 
 .... From the list of endpoints above, specify those that have error/exceptional test cases in your test code, the relevant test file and the nature of the test case(s), e.g.
 
 + Post /api/movies - test when the new movie has no title, invalid release date, empty genre list. Test adding a movie without prior authentication. See tests/functional/api/movies/index.js 
++ Get /api/movies - test  movies list when the token is valid and invalid(when unauthorized).
++ Get /api/movies/:id - test a specific movie when the id is valid and invalid.
++ Get /api/users - test users list
++ Post /api/users - test registering a new user
++ Delete /api/movies/:id - test delete operation when the id is valid.
 
 ## Continuous Delivery/Deployment.
 
 ..... Specify the URLs for the staging and production deployments of your web API, e.g.
 
-+ https://movies-api-trial-staging.herokuapp.com/ - Staging deployment
-+ https://movies-api-production.herokuapp.com/ - Production
++ https://assignments2.herokuapp.com/ - Staging deployment
++ https://assignments2-master.herokuapp.com/ - Production
 
 .... Show a screenshots from the overview page for the two Heroku apps e,g,
 
@@ -122,13 +137,14 @@ Name: Ziqi Zhou
 
 + Production app overview 
 
-[ , , , screenshot here . . . ]
-
-[If an alternative platform to Heroku was used then show the relevant page from that platform's UI.]
+  ![][productionapp]
 
 ## Feature Flags (If relevant)
 
 ... Specify the feature(s) in your web API that is/are controlled by a feature flag(s). Mention the source code files that contain the Optimizerly code that implement the flags. Show screenshots (with appropriate captions) from your Optimizely account that prove you successfully configured the flags.
 
-
 [stagingapp]: ./img/stagingapp.png
+[productionapp]: ./img/productionapp.png
+
+
+
