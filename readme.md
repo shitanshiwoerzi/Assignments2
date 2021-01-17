@@ -4,28 +4,28 @@ Name: Ziqi Zhou
 
 ## Features.
 
-...... A bullet-point list of the ADDITIONAL features you have implemented in the API **THAT WERE NOT IN THE LABS** ......,
-
- + Feature 1 - .... a statement of its purpose/objective ..... 
- + Feature 2 - .......
- + Feature 3 = ......
- + etc
- + etc
+ + Feature 1 - Custom API Documentations with Swagger
+ + Feature 2 - Add many mongoose models to load data locally and  in the cloud mongodb.
+ + Feature 3 -  new API routes, including a parameterised URL.
+ + Feature 4 - Mongo integration
+ + Feature 5 - Minimal React integration(GET and POST data to API)
+ + Feature 6 - Nested Document and/or object referencing in Mongo/Mongoose.
+ + Feature 7 - Basic Authentication
+ + Feature 8 - Good use of express middleware ( Error handling).
 
 ## Installation Requirements
-
-Describe what needs to be on the machine to run the API (Node v?, NPM, MongoDB instance, any other 3rd party software not in the package.json). 
 
 Describe getting/installing the software, perhaps:
 
 ```bat
-git clone http:\myrepo.git
+git clone https://github.com/shitanshiwoerzi/Assignments2.git
 ```
 
 followed by installation
 
 ```bat
-git install
+git install swagger-ui express
+git install swagger-jsdocs
 ```
 
 ## API Configuration
@@ -35,54 +35,150 @@ REMEMBER: DON'T PUT YOUR OWN USERNAMES/PASSWORDS/AUTH KEYS IN THE README OR ON G
 ```bat
 NODE_ENV=development
 PORT=8080
-HOST=
-mongoDB=YourMongoURL
-seedDb=true
-secret=YourJWTSecret
+HOST=localhost
+mongoDB=mongodb+srv://Zhou:<password>@test.5cr3l.mongodb.net/test?retryWrites=true&w=majority
+SEED_DB=true
+secret=<JWTtoken>
 ```
 
 
 ## API Design
 Give an overview of your web API design, perhaps similar to the following: 
 
-|  |  GET | POST | PUT | DELETE
-| -- | -- | -- | -- | -- 
-| /api/movies |Gets a list of movies | N/A | N/A |
-| /api/movies/{movieid} | Get a Movie | N/A | N/A | N/A
-| /api/movies/{movieid}/reviews | Get all reviews for movie | Create a new review for Movie | N/A | N/A  
-| ... | ... | ... | ... | ...
-
+| Path                             | GET                              | POST                            | PUT           | DELETE                                |
+| -------------------------------- | :------------------------------- | ------------------------------- | ------------- | ------------------------------------- |
+| /api/movies                      | Get a list of movies             | N/A                             | N/A           | N/A                                   |
+| /api/movies/{movieid}            | Get a specific movie             | Update something of a movie     | N/A           | Delete the specific movie             |
+| /api/movies/{movieid}/reviews    | Get all reviews for movie        | Create a new review for Movie   | N/A           | Delete all reviews for movie          |
+| /api/nowplaying                  | Get a list of now-playing movie  | N/A                             | N/A           | N/A                                   |
+| /api/nowplaying/{nowplayingid}   | Get a specific now-playing movie | Update a specific movie         | N/A           | Delete the specific now-playing movie |
+| /api/upcoming                    | Get a list of upcoming movies    | N/A                             | N/A           | N/A                                   |
+| /api/upcoming/{upcomingid}       | Get a specific upcoming movie    | Update a specific movie         | N/A           | Delete the specific upcoming movie    |
+| /api/toprated                    | Get a list of top-rated movies   | N/A                             | N/A           | N/A                                   |
+| /api/toprated/{topratedid}       | Get a specific top-rated movie   | Update a specific movie         | N/A           | Delete the specific top-rated movie   |
+| /api/users                       | Get a list of users              | Register or authenticate a user | N/A           | N/A                                   |
+| /api/users/{userid}              | N/A                              | N/A                             | Update a user | N/A                                   |
+| /api/users/{username}/favourites | Get Movie Favourites             | Add a favourite                 | N/A           | N/A                                   |
+| /api/actors                      | Get a list of actors             | N/A                             | N/A           | N/A                                   |
+| /api/actors/{actorid}            | Get details of one actor         | N/A                             | N/A           | N/A                                   |
 If you have your API design on an online platform or graphic, please link to it (e.g. [Swaggerhub](https://app.swaggerhub.com/)).
+
+http://localhost:8080/api-docs/ (with Swagger ui)
 
 
 ## Security and Authentication
 Give details of authentication/ security implemented on the API(e.g. passport/sessions). Indicate which routes are protected.
+
+~~~javascript
+import passport from 'passport';
+import passportJWT from 'passport-jwt';
+import UserModel from './../api/users/userModel';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
+
+let jwtOptions = {};
+jwtOptions.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
+jwtOptions.secretOrKey = process.env.SECRET;
+const strategy = new JWTStrategy(jwtOptions, async (payload, next) => {
+  const user = await UserModel.findByUserName(payload);
+  if (user) {
+    next(null, user);
+  } else {
+    next(null, false);
+  }
+});
+passport.use(strategy);
+
+export default passport;
+~~~
+
+~~~javascript
+app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
+~~~
+
+Protected Router
+
+~~~javascript
+<PrivateRoute path="/movies" component={Movies} />
+~~~
 
 ## Integrating with React App
 
 Describe how you integrated your React app with the API. Perhaps link to the React App repo and give an example of an API call from React App. For example: 
 
 ~~~Javascript
-export const getMovies = () => {
-  return fetch(
-     '/api/movies',{headers: {
-       'Authorization': window.localStorage.getItem('token')
-    }
-  }
-  )
-    .then(res => res.json())
-    .then(json => {return json.results;});
+export const login = (username, password) => {
+    return fetch('/api/users', {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'post',
+        body: JSON.stringify({ username: username, password: password })
+    }).then(res => res.json())
 };
+
+export const signup = (username, password) => {
+    return fetch('/api/users?action=register', {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'post',
+        body: JSON.stringify({ username: username, password: password })
+    }).then(res => res.json())
+};
+
+export const getMovies = () => {
+    return fetch(
+       '/api/movies',{headers: {
+         'Authorization': window.localStorage.getItem('token')
+      }
+    }
+    ).then(res => res.json());
+  };
+export const getNowplaying = () =>{
+    return fetch(
+        '/api/nowplaying',{headers: {
+            'Content-Type': 'application/json'
+     }
+   }
+   ).then(res => res.json());
+};
+
+export const getUpcoming = () =>{
+    return fetch(
+        '/api/upcoming',{headers: {
+            'Content-Type': 'application/json'
+     }
+   }
+   ).then(res => res.json());
+};
+
+export const getToprated = () =>{
+    return fetch(
+        '/api/toprated',{headers: {
+            'Content-Type': 'application/json'
+     }
+   }
+   ).then(res => res.json());
+};
+
+export const getPeople = () => {
+    return fetch(
+        '/api/actor',{ headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json())
+}
 
 ~~~
 
-## Extra features
-
-. . Briefly explain any non-standard features, functional or non-functional, developed for the app.  
-
 ## Independent learning.
 
-. . State the non-standard aspects of React/Express/Node (or other related technologies) that you researched and applied in this assignment . .  
+Swagger-jsdoc (automatically generating Swagger Documentation for the Node API) .
 
 
 

@@ -64,7 +64,7 @@ router.put('/:id', (req, res, next) => {
     .catch(next);
 });
 
-//Add a favourite. No Error Handling Yet. Can add duplicates too!
+//Add a favourite. HAVE Error Handling . Cant add duplicates!
 router.post('/:userName/favourites', async (req, res, next) => {
   try{
   const newFavourite = req.body.id;
