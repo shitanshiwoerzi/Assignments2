@@ -120,8 +120,6 @@ app.put('/movie',(req,res)=> {
   res.status(200).send('Successfully updated movie');
 });
 
-
-
 const server = app.listen(port, () => {
   console.info(`Server running at ${port}`);
 });
